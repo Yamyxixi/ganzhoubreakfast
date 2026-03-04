@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!-- 
+====================================================
+  赣州早餐30 · 郁孤台版 (CDN加速版)
+  开发者：[Yamy]
+  创作日期：2026年3月
+  优化点：图片CDN加速/音频自动播放+按钮控制
+==================================================== 
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>赣州早餐 · 摇签抽中哪家吃哪家</title><!-- 微信/QQ 等社交平台预览元标签 -->
+<meta property="og:title" content="赣州早餐随缘签" />
+<meta property="og:description" content="30家地道老店，摇一签决定今天吃什么！" />
+<meta property="og:image" content="https://pic1.imgdb.cn/item/69a0e768569239540e67a601.jpg" />
+<meta property="og:url" content="https://yamy-xxxxxym.github.io/ganzhoubreakfast/" />
+<meta property="og:type" content="website" />
+
+<!-- 微信专用预览优化 -->
+<meta name="wechat-webview-title" content="赣州早餐随缘签" />
+<link rel="shortcut icon" href="https://pic1.imgdb.cn/item/69a0e768569239540e67a601.jpg" type="image/jpeg" />
+    <!-- 预加载关键图片（建议替换为您的CDN链接） -->
+    <link rel="preload" as="image" href="https://pic1.imgdb.cn/item/69a0e768569239540e67a601.jpg">
+    <link rel="preload" as="image" href="https://pic1.imgdb.cn/item/69a0e826569239540e67a612.png">
+    <style>
+        /* ========== 全局重置 & 郁孤台背景 ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', '华文楷体', 'KaiTi', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            position: relative;
+            min-height: 100vh;
+            padding: 1rem;
+            background-color: #f3ede3;
+        }
+
+        /* 虚化郁孤台背景 - 建议替换为CDN链接 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://pic1.imgdb.cn/item/69a0e768569239540e67a601.jpg') no-repeat center center fixed;
+            background-size: cover;
+            filter: blur(8px);
+            z-index: -2;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.1);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ========== 音乐控制按钮 ========== */
+        .music-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 30;
+            font-size: 24px;
+            color: white;
+            text-shadow: 0 0 5px black;
+            transition: all 0.2s;
+        }
+        .music-control:hover {
+            background: rgba(255,215,0,0.3);
+            transform: scale(1.1);
+        }
+
+        /* ========== 上半部分抽签卡片 ========== */
+        .card {
+            background: transparent;
+            backdrop-filter: blur(8px);
+            border-radius: 48px;
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.5);
+            padding: 2rem 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.3);
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .badge {
+            background: rgba(0,0,0,0.4);
+            color: white;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(4px);
+        }
+
+        /* ========== 签筒容器 ========== */
+        .lottery-container {
+            position: relative;
+            margin: 0 auto 30px;
+            width: 220px;
+            height: 260px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 签筒 – 早餐图标填充 - 建议替换为CDN链接 */
+        .lottery-tube {
+            width: 180px;
+            height: 220px;
+            background-image: url('https://pic1.imgdb.cn/item/69a0e826569239540e67a612.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #e8d5b5;
+            border-radius: 10px 10px 30px 30px;
+            position: relative;
+            box-shadow: 0 15px 20px rgba(0,0,0,0.4);
+            z-index: 10;
+            border: 2px solid #a06732;
+        }
+
+        .lottery-tube::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #d4af37, #fff700, #d4af37);
+            border-radius: 8px 8px 0 0;
+            z-index: 11;
+        }
+
+        .lottery-stick {
+            width: 24px;
+            height: 140px;
+            background: linear-gradient(90deg, #fef9e7, #fffbf0, #fef9e7);
+            border-radius: 4px 4px 12px 12px;
+            position: absolute;
+            bottom: 70px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            z-index: 5;
+            border: 1px solid #b97c48;
+            left: 50%;
+            transform: translateX(calc(var(--x) - 50%));
+        }
+
+        .lottery-stick::before {
+            content: "";
+            position: absolute;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 14px;
+            height: 14px;
+            background-color: #c12c1e;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(193, 44, 30, 0.5);
+        }
+
+        .stick-text {
+            position: absolute;
+            top: 25px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 11px;
+            color: #8b4513;
+            writing-mode: vertical-rl;
+            line-height: 16px;
+            font-weight: bold;
+            text-shadow: 0 0 2px #fff2d7;
+            word-break: break-all;
+        }
+
+        @keyframes containerShake {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(8deg); }
+            50% { transform: rotate(-8deg); }
+            75% { transform: rotate(6deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .lottery-container.shaking {
+            animation: containerShake 0.25s infinite;
+        }
+
+        @keyframes stickPop {
+            0% { transform: translate(calc(var(--x) - 50%), 0) rotate(0deg); bottom: 70px; }
+            100% { transform: translate(calc(var(--x) - 50%), -180px) rotate(15deg); bottom: 70px; z-index: 15; }
+        }
+
+        .lottery-stick.popup {
+            animation: stickPop 0.9s ease forwards;
+            background: linear-gradient(90deg, #fff8dc, #ffffe0, #fff8dc);
+            border-color: #d4af37;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .lottery-btn {
+            padding: 10px 30px;
+            border: none;
+            border-radius: 40px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            font-family: 'Segoe UI', '华文楷体', sans-serif;
+            transition: all 0.2s;
+            font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #shakeBtn {
+            background-color: #e08642;
+            color: white;
+            border: 1px solid #f5b889;
+        }
+
+        #shakeBtn:hover {
+            background-color: #c96f2c;
+            transform: translateY(-2px);
+        }
+
+        #shakeBtn:disabled {
+            background-color: #f08080;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #resetBtn {
+            background-color: rgba(218,194,156,0.9);
+            color: #4a2e1a;
+            border: 1px solid #b18d5a;
+            display: none;
+        }
+
+        #resetBtn:hover {
+            background-color: #c9af7a;
+            transform: translateY(-2px);
+        }
+
+        .result-card {
+            background: #fef7e6;
+            border-radius: 28px;
+            padding: 1.8rem 1.2rem;
+            margin: 1.5rem 0 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,215,0,0.3);
+            border: 2px solid #b35e2e;
+            position: relative;
+            display: none;
+            animation: popFromBottom 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: bottom center;
+            color: #4a2512;
+        }
+
+        @keyframes popFromBottom {
+            0% { transform: scale(0.2) translateY(30px); opacity: 0; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .result-card::before {
+            content: "";
+            position: absolute;
+            top: 8px; left: 8px; right: 8px; bottom: 8px;
+            background: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="1" stitchTiles="stitch"/><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.2 0"/></filter><rect width="100" height="100" filter="url(%23noise)" opacity="0.15"/></svg>');
+            opacity: 0.15;
+            pointer-events: none;
+            border-radius: 18px;
+        }
+
+        .shop-photo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #b35e2e;
+            margin: 0 auto 0.5rem;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+            background: #e6c8a0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #4a2512;
+        }
+
+        .shop-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .shop-photo.loading::after {
+            content: "";
+            width: 40px;
+            height: 40px;
+            border: 3px solid #b35e2e;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .shop-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #4a2512;
+            text-align: center;
+            line-height: 1.3;
+            border-bottom: 2px dashed #b35e2e;
+            padding-bottom: 0.3rem;
+            font-family: '华文楷体', 'KaiTi', serif;
+        }
+
+        .shop-address {
+            color: #6b4a2a;
+            font-size: 0.9rem;
+            background: rgba(180, 120, 70, 0.1);
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 0.3rem 0;
+        }
+
+        .shop-rec {
+            margin: 0.8rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            justify-content: center;
+        }
+
+        .shop-rec span {
+            background: #e6c8a0;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            border: 1px solid #b35e2e;
+            color: #4a2512;
+            font-weight: 500;
+            box-shadow: inset 0 1px 3px #fff2d7;
+        }
+
+        .shop-summary {
+            background: rgba(255,240,210,0.7);
+            border-radius: 16px;
+            padding: 0.8rem;
+            color: #3e2a14;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-left: 4px solid #b35e2e;
+            margin: 0.8rem 0;
+            text-align: left;
+        }
+
+        .nav-link {
+            display: block;
+            background: #b35e2e;
+            color: white;
+            padding: 0.6rem;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 1rem 0 0;
+            border: 1px solid #ffd966;
+            transition: background 0.2s;
+            font-family: sans-serif;
+        }
+
+        .nav-link:hover {
+            background: #9b4e26;
+        }
+
+        .intro-section {
+            background: transparent;
+            backdrop-filter: blur(8px);
+            border-radius: 48px 48px 36px 36px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 15px 30px -8px rgba(0,0,0,0.5);
+            margin-top: 1rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 2px 2px 3px black;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+<!-- 微信/QQ 等社交平台预览元标签 -->
+<meta property="og:title" content="赣州早餐随缘签" />
+<meta property="og:description" content="30家地道老店，摇一签决定今天吃什么！" />
+<meta property="og:image" content="https://pic1.imgdb.cn/item/69a0e768569239540e67a601.jpg" />
+<meta property="og:url" content="https://yamy-xxxxxym.github.io/ganzhoubreakfast/" />
+<meta property="og:type" content="website" />
+
+<!-- 微信专用预览优化 -->
+<meta name="wechat-webview-title" content="赣州早餐随缘签" />
+<link rel="shortcut icon" href="https://pic1.imgdb.cn/item/69a0e768569239540e67a601.jpg" type="image/jpeg" />
+        .section-sub {
+            text-align: center;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            margin-bottom: 2rem;
+            font-style: italic;
+            border-bottom: 2px dashed rgba(255,255,255,0.5);
+            padding-bottom: 1rem;
+        }
+
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .shop-card {
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(4px);
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.2s;
+        }
+
+        .shop-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .shop-card h3 {
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            border-left: 5px solid rgba(255,255,255,0.8);
+            padding-left: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .shop-card .address {
+            color: white;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stars {
+            color: #ffd966;
+            font-size: 1.1rem;
+            text-shadow: 1px 1px 1px black;
+        }
+
+        .rating-score {
+            background: rgba(165,131,84,0.8);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .summary {
+            color: white;
+            text-shadow: 1px 1px 2px black;
+            background: rgba(0,0,0,0.2);
+            padding: 0.8rem;
+            border-radius: 18px;
+            margin: 0.8rem 0;
+            border: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .recommend {
+            color: white;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-top: 1px dashed rgba(255,255,255,0.4);
+            padding-top: 0.8rem;
+        }
+
+        .recommend span {
+            background: rgba(255,225,179,0.3);
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            color: white;
+            text-align: center;
+            border-top: 1px dashed rgba(255,255,255,0.4);
+            padding-top: 1.5rem;
+        }
+
+        /* 懒加载图片样式（保留但未使用） */
+        .lazy-img {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .lazy-img.loaded {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 上半部分：抽签卡片 -->
+    <div class="card">
+        <!-- 音乐控制按钮 -->
+        <div class="music-control" id="musicToggle">
+            <span id="musicIcon">🔊</span>
+        </div>
+
+        <h1><span>🥄</span> 赣州早餐随缘<span>🥢</span></h1>
+        <div class="badge">30家地道老店 · 摇出你的本命早餐</div>
+
+        <!-- 签筒与签子容器 -->
+        <div class="lottery-container" id="lotteryContainer">
+            <div class="lottery-tube"></div>
+            <!-- 8支签子 -->
+            <div class="lottery-stick" style="--x: -70px;"><div class="stick-text"></div></div>
+            <div class="lottery-stick" style="--x: -50px;"><div class="stick-text"></div></div>
+            <div class="lottery-stick" style="--x: -30px;"><div class="stick-text"></div></div>
+            <div class="lottery-stick" style="--x: -10px;"><div class="stick-text"></div></div>
+            <div class="lottery-stick" style="--x: 10px;"><div class="stick-text"></div></div>
+            <div class="lottery-stick" style="--x: 30px;"><div class="stick-text"></div></div>
+            <div class="lottery-stick" style="--x: 50px;"><div class="stick-text"></div></div>
+            <div class="lottery-stick" style="--x: 70px;"><div class="stick-text"></div></div>
+        </div>
+
+        <div class="btn-group">
+            <button class="lottery-btn" id="shakeBtn">🎋 摇一签</button>
+            <button class="lottery-btn" id="resetBtn">↺ 重摇</button>
+        </div>
+
+        <!-- 抽签结果卡片 -->
+        <div class="result-card" id="resultCard">
+            <div class="shop-photo" id="resultPhoto">
+                <img src="" alt="" id="resultImg">
+            </div>
+            <div class="shop-name" id="resultName"></div>
+            <div class="shop-address" id="resultAddress"></div>
+            <div class="shop-rec" id="resultRec"></div>
+            <div class="shop-summary" id="resultSummary"></div>
+            <a href="#" target="_blank" class="nav-link" id="resultNav" rel="noopener noreferrer">🗺️ 高德地图 · 去这里</a>
+        </div>
+    </div>
+
+    <!-- 下半部分：30家店详细介绍 -->
+    <div class="intro-section">
+        <div class="section-title">
+            <span>📋</span> 赣州30家早餐店·口碑合辑 <span>📋</span>
+        </div>
+        <div class="section-sub">
+            综合小红书、大众点评、百度地图近一年真实评价 · 每日清晨的烟火气
+        </div>
+        <div id="shopListContainer" class="shop-grid"></div>
+        <div class="footer-note">⭐ 评分综合自各平台用户评价 · 数据整理与原创文案 © [Yamy]2026</div>
+    </div>
+</div>
+
+<!-- 背景音乐元素（使用CDN加速链接） -->
+<audio id="bgMusic" loop preload="auto" crossorigin="anonymous">
+    <!-- 请替换为您自己的音频CDN链接，推荐使用阿里云OSS/七牛云等国内CDN -->
+    <source src="https://cdn.jsdelivr.net/gh/Yamy-xxxxxym/music1@main/music1.mp3" type="audio/mpeg">
+    您的浏览器不支持音频元素。
+</audio>
+
+<script>
+(function() {
+    // ========== 30家早餐店数据 (完整版，所有图片建议替换为CDN加速链接) ==========
+    const breakfastSpots = [
+        { name: "燕子婆早餐店", address: "章贡区黄屋坪路25-10号", mapLink: "https://uri.amap.com/marker?position=114.946429,25.843371&name=%E7%87%95%E5%AD%90%E5%A9%86%E6%97%A9%E9%A4%90%E5%BA%97&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25a90ec0a30908d67eb6a.jpg", rating: 4.7, summary: "小红书热门榜常客，肉丸汤被网友称为‘赣州第一’。大众点评4.6星，老城区居民从小吃到大，拌粉用的花生米和萝卜干都是自制，油条现炸酥脆。不少外地游客专程来打卡，早上八点后可能需要排队。", recommended: ["肉丸汤", "拌粉", "油条"] },
+        { name: "周记早点(阳明路店)", address: "章贡区坛子巷11-A-3", mapLink: "https://uri.amap.com/marker?position=114.942450,25.863263&name=%E5%91%A8%E8%AE%B0%E6%97%A9%E7%82%B9(%E9%98%B3%E6%98%8E%E8%B7%AF%E5%BA%97)&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25d51ec0a30908d67ec27.jpg", rating: 4.5, summary: "老赣州人从小吃到大的早餐店，豆浆是石磨现磨，浓郁无渣。油条炸得金黄酥脆，搭配特制辣椒酱很受欢迎。美团早餐热搜榜常客，很多人评价‘油条配豆浆，绝配’。店面不大但干净整洁，老板娘热情。", recommended: ["豆浆", "油条", "茶叶蛋"] },
+        { name: "阿乌叼早餐", address: "章贡区天竺山路12号", mapLink: "https://uri.amap.com/marker?position=114.920426,25.818247&name=%E9%98%BF%E4%B9%8C%E5%8F%BC%E6%97%A9%E9%A4%90&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25a9eec0a30908d67eb6c.jpg", rating: 4.4, summary: "大众点评收录6年老店，三鲜粉料足汤浓，猪肝、瘦肉、小肠都是现烫，新鲜不腥。本地人推荐‘一定要加辣椒油’，他们家的辣椒油是秘制的，香而不燥。小红书博主称‘隐藏的嗦粉宝地’，很多人从老城区专程过去。", recommended: ["三鲜粉", "猪肝汤"] },
+        { name: "东郊路早餐店", address: "章贡区东郊路12-3号", mapLink: "https://uri.amap.com/marker?position=114.957959,25.854485&name=%E4%B8%9C%E9%83%8A%E8%B7%AF%E6%97%A9%E9%A4%90%E5%BA%97&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25ab0ec0a30908d67eb74.jpg", rating: 4.5, summary: "没有招牌的社区店，但大众点评上好评如潮。心肺汤是招牌，面条是自己做的，筋道有嚼劲，卤汁里加了香菇，特别香。许多顾客从城北开车来吃，就为了这一口。老板记性好，熟客的口味都记得。", recommended: ["心肺汤", "卤蛋"] },
+        { name: "咪咪早点", address: "章贡区小华兴街与和平路交叉口", mapLink: "https://uri.amap.com/marker?position=114.929168,25.788125&name=%E5%92%AA%E5%92%AA%E6%97%A9%E7%82%B9&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25ac1ec0a30908d67eb77.jpg", rating: 4.3, summary: "美团评分4.4，主打蒸饺和拌粉。蒸饺皮薄馅大，肉馅鲜甜多汁，配着免费的萝卜干特别开胃。老板娘很热情，记得不少熟客的口味。价格实惠，人均8元能吃饱。很多附近的上班族早餐首选。", recommended: ["蒸饺", "拌粉", "萝卜干"] },
+        { name: "健民现磨豆浆", address: "章贡区人民巷2号", mapLink: "https://uri.amap.com/marker?position=114.939175,25.853003&name=%E5%81%A5%E6%B0%91%E7%8E%B0%E7%A3%A8%E8%B1%86%E6%B5%86&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25aceec0a30908d67eb78.jpg", rating: 4.8, summary: "小红书爆款，号称‘赣州最好喝的豆浆’。每天早上现磨，豆浆浓郁无渣，豆香十足。搭配现炸油条或烧麦，人均5元就能饱腹。大众点评五星好评，很多人评论‘喝完才知道以前喝的豆浆都是水’。", recommended: ["现磨豆浆", "烧麦", "油条"] },
+        { name: "华顺美食", address: "章贡区东阳山路8号4-5号", mapLink: "https://uri.amap.com/marker?position=114.938521,25.847681&name=%E5%8D%8E%E9%A1%BA%E7%BE%8E%E9%A3%9F&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25c7cec0a30908d67ebe8.jpg", rating: 4.3, summary: "主打炒粉和瓦罐汤的早餐店，锅气十足。牛肉炒粉牛肉给得多，米粉干爽不油腻。瓦罐汤种类多，香菇肉饼汤最受欢迎。附近上班族和居民经常光顾，高峰期需要等位。大众点评评价‘物美价廉，分量足’。", recommended: ["牛肉炒粉", "香菇肉饼汤"] },
+        { name: "津香餐馆", address: "章贡区西津路15-1号", mapLink: "https://uri.amap.com/marker?position=114.938671,25.861801&name=%E6%B4%A5%E9%A6%99%E9%A4%90%E9%A6%86&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25c91ec0a30908d67ebf1.jpg", rating: 4.4, summary: "天津风味早餐店，在赣州开了十几年。包子是招牌，鲜肉包皮薄馅大，咬开有汤汁。豆腐脑有咸甜两种，很多学生和老师常来。小红书博主推荐‘肉包子配豆浆，北方人的早餐’。", recommended: ["鲜肉包", "豆腐脑"] },
+        { name: "民扬早餐", address: "章贡区赣州经济技术开发区蟠龙镇河坝小区5栋7号", mapLink: "https://uri.amap.com/marker?position=114.880344,25.835736&name=%E6%B0%91%E6%89%AC%E6%97%A9%E9%A4%90&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25bcbec0a30908d67ebbc.jpg", rating: 4.4, summary: "居民区里的早餐店，生意火爆。包子、肉饼汤是招牌，肉饼鲜嫩，汤清甜不腻。拌粉用的花生米特别香，辣椒油自己加。大众点评上很多人评论‘从小学吃到现在，还是那个味道’。价格亲民，分量足。", recommended: ["肉饼汤", "拌粉"] },
+        { name: "德期饮食店", address: "章贡区海会路与厚德路交叉口北80米", mapLink: "https://uri.amap.com/marker?position=114.949182,25.858838&name=%E5%BE%B7%E6%9C%9F%E9%A5%AE%E9%A3%9F%E5%BA%97&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25bddec0a30908d67ebc8.jpg", rating: 4.5, summary: "开了三十年的老字号，很多老赣州人从小吃到大。炸茄子米果是招牌，特别香。鹌鹑蛋肉饼汤清淡鲜美，本地粉绝配。店面不大，但每天早上一波接一波的客人。", recommended: ["腌菜炒饭", "蛋皮汤"] },
+        { name: "温阿姨.瑞金烂厅下牛肉汤", address: "章贡区红环路7-6号", mapLink: "https://uri.amap.com/marker?position=114.933899,25.852060&name=%E6%B8%A9%E9%98%BF%E5%A7%A8.%E7%91%9E%E9%87%91%E7%83%82%E5%8E%85%E4%B8%8B%E7%89%9B%E8%82%89%E6%B1%A4&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25adaec0a30908d67eb86.jpg", rating: 4.9, summary: "源自瑞金的百年老字号，大众点评赣州牛肉汤第一名。汤底用几十种药材熬制，牛肉鲜嫩，汤醇厚不腻。可以免费续汤，配着现烤烧饼吃特别香。小红书评价‘暖心暖胃，牛肉分量足，值得排队’。", recommended: ["招牌牛肉汤", "牛杂汤", "烧饼"] },
+        { name: "于振华美食(章江北大道店)", address: "章贡区章江北大道88号", mapLink: "https://uri.amap.com/marker?position=114.929348,25.844518&name=%E4%BA%8E%E6%8C%AF%E5%8D%8E%E7%BE%8E%E9%A3%9F(%E7%AB%A0%E6%B1%9F%E5%8C%97%E5%A4%A7%E9%81%93%E5%BA%97)&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25ae9ec0a30908d67eb88.jpg", rating: 4.6, summary: "美团高分店铺，三鲜粉是招牌。猪肝、瘦肉、小肠处理得特别干净，没有腥味，汤清味鲜。很多外地游客专门打卡。环境干净，服务态度好。", recommended: ["三鲜粉"] },
+        { name: "李记烧饼(营角上路店)", address: "章贡区柴火坪19-1", mapLink: "https://uri.amap.com/marker?position=114.939938,25.847788&name=%E6%9D%8E%E8%AE%B0%E7%83%A7%E9%A5%BC(%E8%90%A5%E8%A7%92%E4%B8%8A%E8%B7%AF%E5%BA%97)&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25af4ec0a30908d67eb95.jpg", rating: 4.7, summary: "20年老店，烧饼外酥里软，梅干菜肉馅最受欢迎。每天现烤现卖，刚出炉的烧饼烫手但特别香。大众点评评价‘每次路过必买，趁热吃绝了’。除了梅干菜的，还有鲜肉和红糖馅的。", recommended: ["梅干菜烧饼", "鲜肉烧饼"] },
+        { name: "兴国米粉鱼(黄屋坪路店)", address: "章贡区东外街道黄屋坪路27-6号", mapLink: "https://uri.amap.com/marker?position=114.946490,25.843190&name=%E5%85%B4%E5%9B%BD%E7%B1%B3%E7%B2%89%E9%B1%BC(%E9%BB%84%E5%B1%8B%E5%9D%AA%E8%B7%AF%E5%BA%97)&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25b03ec0a30908d67eb99.jpg", rating: 4.8, summary: "兴国特色早餐，米粉鱼是必点。草鱼块裹米粉蒸制，鲜辣入味，底下垫的芋头吸收了鱼汁特别好吃。小红书称‘赣州早餐界扛把子’。可以搭配一碗瓦罐汤，完美。", recommended: ["米粉鱼", "芋头蒸肉"] },
+        { name: "老王信丰萝卜饺", address: "章贡区红旗村渔湾里美食街f2号", mapLink: "https://uri.amap.com/marker?position=114.928259,25.845491&name=%E8%80%81%E7%8E%8B%E4%BF%A1%E4%B8%B0%E8%90%9D%E5%8D%9C%E9%A5%BA&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25b10ec0a30908d67eba0.jpg", rating: 4.6, summary: "渔湾里必吃小吃，萝卜饺晶莹剔透，内馅是萝卜丝和辣椒，酸甜开胃。艾米果也值得一试，软糯香甜。大众点评常年位居小吃榜前列，很多游客专门来打卡。", recommended: ["信丰萝卜饺", "艾米果"] },
+        { name: "廖婆婆早餐店(文清路店)", address: "章贡区黄屋坪路14号", mapLink: "https://uri.amap.com/marker?position=114.946204,25.844072&name=%E5%BB%96%E5%A9%86%E5%A9%86%E6%97%A9%E9%A4%90%E5%BA%97(%E6%96%87%E6%B8%85%E8%B7%AF%E5%BA%97)&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25b22ec0a30908d67eba5.jpg", rating: 4.7, summary: "南昌瓦罐汤与赣州本地口味结合的典范，肉饼汤鲜香，肉饼紧实不散。拌粉爽滑，花生米特别脆。小红书博主称‘早餐来一罐汤，元气满满’。店面虽小，但干净整洁。", recommended: ["肉饼汤", "香菇鸡汤拌粉"] },
+        { name: "一碗嗦粉", address: "章贡区健康路71-1号", mapLink: "https://uri.amap.com/marker?position=114.945110,25.850780&name=%E4%B8%80%E7%A2%97%E5%97%A6%E7%B2%89&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25b2dec0a30908d67ebaa.jpg", rating: 4.5, summary: "江南宋城景区旁的网红嗦粉店，装修复古，拍照很出片。大众点评推荐‘牛肉拌粉’和‘猪血汤’。牛肉卤得入味，粉条爽滑。游客评价‘逛古城顺便嗦粉，体验很好’。", recommended: ["牛肉拌粉", "猪血汤"] },
+        { name: "张记传统烧饼", address: "章贡区南京路7号", mapLink: "https://uri.amap.com/marker?position=114.942474,25.859380&name=%E5%BC%A0%E8%AE%B0%E4%BC%A0%E7%BB%9F%E7%83%A7%E9%A5%BC&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25b39ec0a30908d67ebac.jpg", rating: 4.6, summary: "老赣州人从小吃到大的烧饼摊，现在有了店面。烧饼有甜咸两种，红糖烧饼是招牌，咬开能流糖。美团评价‘便宜又好吃，满满的回忆’。每天早上排队，经常十点就卖完了。", recommended: ["红糖烧饼", "葱油烧饼"] },
+        { name: "十字街老太婆（赣一中店）", address: "章江路12号富苑小区12-7至8号铺位", mapLink: "https://uri.amap.com/marker?position=114.925551,25.822795&name=%E5%8D%81%E5%AD%97%E8%A1%97%E8%80%81%E5%A4%AA%E5%A9%86%EF%BC%88%E8%B5%A3%E4%B8%80%E4%B8%AD%E5%BA%97%EF%BC%89&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25bb3ec0a30908d67ebb8.jpg", rating: 4.4, summary: "24小时营业的南昌小吃店，是很多人的深夜食堂。南昌拌粉味道正宗，瓦罐汤种类多。小红书评价‘味道正宗，价格实惠’。学生和出租车司机经常光顾。", recommended: ["南昌拌粉", "鸡蛋肉饼汤"] },
+        { name: "余水胜美食", address: "章贡区宁都路17-13号店铺瑞安家园安置小区底层", mapLink: "https://uri.amap.com/marker?position=114.939647,25.824837&name=%E4%BD%99%E6%B0%B4%E8%83%9C%E7%BE%8E%E9%A3%9F&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25bc0ec0a30908d67ebb9.jpg", rating: 4.3, summary: "铅山烫粉特色店，米粉Q弹有嚼劲，汤底浓郁。很多上饶人评价‘是家乡的味道’。炒粉也不错，锅气足。店面不大，但干净卫生。", recommended: ["铅山烫粉", "炒粉"] },
+        { name: "安远三鲜粉（瑞安店）", address: "章贡区水南镇瑞安家园安置小区底层宁都路17-40号", mapLink: "https://uri.amap.com/marker?position=114.940049,25.823968&name=%E5%AE%89%E8%BF%9C%E4%B8%89%E9%B2%9C%E7%B2%89%EF%BC%88%E7%91%9E%E5%AE%89%E5%BA%97%EF%BC%89&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25c70ec0a30908d67ebe7.jpg", rating: 4.6, summary: "正宗安远三鲜粉，猪肝、瘦肉、小肠新鲜现煮，汤鲜味美。可以加荷包蛋和卤豆腐。大众点评4.5星，很多人评论‘比安远本地的还好吃’。", recommended: ["三鲜粉", "卤豆腐"] },
+        { name: "芳玉美食", address: "章贡区南河路25号南河花园", mapLink: "https://uri.amap.com/marker?position=114.934200,25.844216&name=%E8%8A%B3%E7%8E%89%E7%BE%8E%E9%A3%9F&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25ca4ec0a30908d67ebf4.jpg", rating: 4.5, summary: "开了十几年的早餐店，萝卜饺和艾米果很受欢迎。萝卜饺皮薄馅足，蘸着辣椒醋吃特别开胃。艾米果软糯，有咸甜两种。本地人常去的老店。", recommended: ["萝卜饺", "艾米果"] },
+        { name: "曾记萝卜饺艾米果（人民巷店）", address: "章贡区人民巷35号", mapLink: "https://uri.amap.com/marker?position=114.938398,25.852959&name=%E6%9B%BE%E8%AE%B0%E8%90%9D%E5%8D%9C%E9%A5%BA%E8%89%BE%E7%B1%B3%E6%9E%9C%EF%BC%88%E4%BA%BA%E6%B0%91%E5%B7%B7%E5%BA%97%EF%BC%89&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25cb2ec0a30908d67ebf9.jpg", rating: 4.7, summary: "人民巷里的老字号，萝卜饺晶莹剔透，能看到里面的馅料。艾米果软糯香甜，豆沙馅是自己熬的。小红书热门打卡地，很多人专门来买真空包装带走。", recommended: ["信丰萝卜饺", "艾米果"] },
+        { name: "曾记汤包铺", address: "章贡区赖家围路8号", mapLink: "https://uri.amap.com/marker?position=114.949081,25.839252&name=%E6%9B%BE%E8%AE%B0%E6%B1%A4%E5%8C%85%E9%93%BA&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25cc4ec0a30908d67ebfd.jpg", rating: 4.6, summary: "灌汤包是招牌，皮薄汁多，吃的时候要小心烫。搭配一碗绿豆汤或豆浆，完美早餐。美团评价‘皮薄馅大，汤汁鲜美，性价比高’。", recommended: ["鲜肉汤包", "绿豆汤"] },
+        { name: "大辫子美食", address: "章贡区文清路8号中联商城美食街内", mapLink: "https://uri.amap.com/marker?position=114.941310,25.851776&name=%E5%A4%A7%E8%BE%AB%E5%AD%90%E7%BE%8E%E9%A3%9F&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25cd1ec0a30908d67ec03.jpg", rating: 4.3, summary: "夫妻店，主打现炒浇头面。腰花面和猪肝面最受欢迎，浇头现炒，锅气十足。面条是自己做的，筋道爽滑。很多学生和家长常来。", recommended: ["腰花面", "猪肝面"] },
+        { name: "良发烫皮", address: "章贡区章江北大道江湾花园小区", mapLink: "https://uri.amap.com/marker?position=114.938772,25.843178&name=%E8%89%AF%E5%8F%91%E7%83%AB%E7%9A%AE&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25ce9ec0a30908d67ec0b.jpg", rating: 4.5, summary: "烫皮是赣南特色早餐，米浆蒸熟卷上肉末，蘸着辣酱吃特别香。美团评分4.6，很多人评论‘每次回赣州必吃’。原味烫皮可以加鸡蛋和肉末。", recommended: ["原味烫皮", "肉末烫皮"] },
+        { name: "老字号邱记小吃", address: "章贡区体育路8号", mapLink: "https://uri.amap.com/marker?position=114.943820,25.859076&name=%E8%80%81%E5%AD%97%E5%8F%B7%E9%82%B1%E8%AE%B0%E5%B0%8F%E5%90%83&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25cf7ec0a30908d67ec16.jpg", rating: 4.6, summary: "招牌是牛肉拌粉和瓦罐汤，牛肉卤得香浓，粉条爽滑。瓦罐汤种类多，墨鱼汤最受欢迎。大众点评五星，评价‘分量足，味道好，价格公道’。", recommended: ["牛肉拌粉", "墨鱼汤"] },
+        { name: "曾莉珍肉饼汤", address: "章贡区南河路17-2号", mapLink: "https://uri.amap.com/marker?position=114.935350,25.846839&name=%E6%9B%BE%E8%8E%89%E7%8F%8D%E8%82%89%E9%A5%BC%E6%B1%A4&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25d09ec0a30908d67ec18.jpg", rating: 4.7, summary: "专门做肉饼汤的老店，肉饼鲜嫩，汤清甜。可以加香菇、墨鱼等。拌粉也很有名，花生米特别脆。很多人评论‘从小喝到大的味道’。", recommended: ["香菇肉饼汤", "拌粉"] },
+        { name: "巧燕美食", address: "章贡区文明大道84-1号", mapLink: "https://uri.amap.com/marker?position=114.934760,25.845599&name=%E5%B7%A7%E7%87%95%E7%BE%8E%E9%A3%9F&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25d15ec0a30908d67ec1b.jpg", rating: 4.4, summary: "主打小笼包和豆浆，现做现蒸，干净卫生。小笼包皮薄馅鲜，咬开有汤汁。豆浆浓郁。医院职工和附近居民常来。", recommended: ["鲜肉小笼包", "豆浆"] },
+        { name: "味然鲜早餐店", address: "章贡区蓉江路与三百山路交叉路口西南侧", mapLink: "https://uri.amap.com/marker?position=114.929757,25.813053&name=%E5%91%B3%E7%84%B6%E9%B2%9C%E6%97%A9%E9%A4%90%E5%BA%97&src=赣州早餐抽签&callnative=1", imageUrl: "https://pic1.imgdb.cn/item/69a25d41ec0a30908d67ec24.jpg", rating: 4.3, summary: "主打三鲜粉和肉丸汤，分量足，价格实惠。三鲜粉的猪肝和瘦肉处理得好，不腥不柴。肉丸Q弹。学生和附近居民常来，性价比高。", recommended: ["三鲜粉", "肉丸汤"] }
+    ];
+
+    // ========== 图片加载优化函数 ==========
+    function loadImageWithPlaceholder(imgElement, src, containerElement) {
+        // 显示加载状态
+        containerElement.classList.add('loading');
+        
+        // 创建临时图片对象加载
+        const tempImg = new Image();
+        tempImg.crossOrigin = 'anonymous';
+        
+        tempImg.onload = function() {
+            // 加载完成后替换并显示
+            imgElement.src = src;
+            imgElement.style.display = 'block';
+            containerElement.classList.remove('loading');
+        };
+        
+        tempImg.onerror = function() {
+            // 加载失败显示默认图（背景图）
+            imgElement.src = 'https://pic1.imgdb.cn/item/69a0e768569239540e67a601.jpg';
+            imgElement.style.display = 'block';
+            containerElement.classList.remove('loading');
+        };
+        
+        // 开始加载
+        tempImg.src = src;
+    }
+
+    // ========== 背景音乐优化控制 ==========
+    const bgMusic = document.getElementById('bgMusic');
+    const musicToggle = document.getElementById('musicToggle');
+    const musicIcon = document.getElementById('musicIcon');
+    let musicPlaying = false;
+    const NORMAL_VOLUME = 0.5;
+    const LOW_VOLUME = 0.15;
+
+    // 初始化音频
+    bgMusic.volume = NORMAL_VOLUME;
+    bgMusic.load();
+
+    // 监听音频可以流畅播放的事件
+    bgMusic.addEventListener('canplaythrough', () => {
+        console.log('音频缓冲完成，可流畅播放');
+    });
+
+    // 监听卡顿事件，自动重试
+    bgMusic.addEventListener('stalled', () => {
+        console.log('音频加载卡顿，尝试重新加载');
+        bgMusic.load();
+    });
+
+    // 监听错误
+    bgMusic.addEventListener('error', (e) => {
+        console.error('音频加载失败', e);
+        musicIcon.textContent = '🔇';
+        musicPlaying = false;
+    });
+
+    // 用户首次点击页面任意位置时尝试播放音乐（解决自动播放限制）
+    document.addEventListener('click', function initMusic() {
+        if (!musicPlaying) {
+            // 如果已经缓冲完成，立即播放
+            if (bgMusic.readyState >= 3) { // HAVE_FUTURE_DATA
+                bgMusic.play().then(() => {
+                    musicPlaying = true;
+                    musicIcon.textContent = '🔊';
+                }).catch(e => console.log('播放失败', e));
+            } else {
+                // 否则等待 canplaythrough
+                bgMusic.addEventListener('canplaythrough', function onCanPlay() {
+                    bgMusic.play().then(() => {
+                        musicPlaying = true;
+                        musicIcon.textContent = '🔊';
+                    }).catch(e => console.log('播放失败', e));
+                    bgMusic.removeEventListener('canplaythrough', onCanPlay);
+                }, { once: true });
+            }
+        }
+        document.removeEventListener('click', initMusic);
+    }, { once: true });
+
+    // 点击按钮切换播放/暂停
+    musicToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (musicPlaying) {
+            bgMusic.pause();
+            musicIcon.textContent = '🔇';
+        } else {
+            // 尝试播放，如果尚未缓冲完成，等待缓冲
+            if (bgMusic.readyState >= 3) {
+                bgMusic.play().then(() => {
+                    musicIcon.textContent = '🔊';
+                }).catch(e => console.log('播放失败'));
+            } else {
+                musicIcon.textContent = '⏳';
+                bgMusic.addEventListener('canplaythrough', function onCanPlay() {
+                    bgMusic.play().then(() => {
+                        musicIcon.textContent = '🔊';
+                    }).catch(e => console.log('播放失败'));
+                    bgMusic.removeEventListener('canplaythrough', onCanPlay);
+                }, { once: true });
+            }
+        }
+        musicPlaying = !musicPlaying;
+    });
+
+    // ========== 摇签音效 ==========
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function playStickSound() {
+        try {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const now = audioCtx.currentTime;
+            
+            const noiseBuffer = audioCtx.createBuffer(1, 4096, audioCtx.sampleRate);
+            const noiseData = noiseBuffer.getChannelData(0);
+            for (let i = 0; i < 4096; i++) {
+                noiseData[i] = Math.random() * 2 - 1;
+            }
+            const noiseSource = audioCtx.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            
+            const noiseGain = audioCtx.createGain();
+            noiseGain.gain.setValueAtTime(0.15, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            
+            const osc = audioCtx.createOscillator();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+            
+            const oscGain = audioCtx.createGain();
+            oscGain.gain.setValueAtTime(0.08, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+            
+            noiseSource.connect(noiseGain).connect(audioCtx.destination);
+            osc.connect(oscGain).connect(audioCtx.destination);
+            
+            noiseSource.start(now);
+            osc.start(now);
+            noiseSource.stop(now + 0.2);
+            osc.stop(now + 0.2);
+        } catch (e) { /* 静音降级 */ }
+    }
+
+    // ========== 抽签逻辑 ==========
+    const container = document.getElementById('lotteryContainer');
+    const shakeBtn = document.getElementById('shakeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const resultCard = document.getElementById('resultCard');
+    const resultImg = document.getElementById('resultImg');
+    const resultPhoto = document.getElementById('resultPhoto');
+    const resultName = document.getElementById('resultName');
+    const resultAddress = document.getElementById('resultAddress');
+    const resultRec = document.getElementById('resultRec');
+    const resultSummary = document.getElementById('resultSummary');
+    const resultNav = document.getElementById('resultNav');
+    const allSticks = document.querySelectorAll('.lottery-stick');
+
+    let isDrawing = false;
+
+    shakeBtn.addEventListener('click', function() {
+        if (isDrawing) return;
+        isDrawing = true;
+        shakeBtn.disabled = true;
+
+        // 抽签开始时，背景音乐降低音量
+        bgMusic.volume = LOW_VOLUME;
+
+        // 播放摇签音效
+        playStickSound();
+
+        // 隐藏之前的结果卡片
+        resultCard.style.display = 'none';
+        // 移除所有签子的弹出状态，并清空文字
+        allSticks.forEach(stick => {
+            stick.classList.remove('popup');
+            stick.querySelector('.stick-text').textContent = '';
+        });
+
+        // 触发容器晃动动画
+        container.classList.add('shaking');
+
+        // 晃动1.2秒后停止并弹出签子
+        setTimeout(() => {
+            container.classList.remove('shaking');
+
+            // 随机选择一支签子弹出
+            const randomIndex = Math.floor(Math.random() * allSticks.length);
+            const selectedStick = allSticks[randomIndex];
+            selectedStick.classList.add('popup');
+
+            // 随机选择一家早餐店
+            const shopIndex = Math.floor(Math.random() * breakfastSpots.length);
+            const spot = breakfastSpots[shopIndex];
+
+            // 将弹出签子的文字设置为店铺名称
+            selectedStick.querySelector('.stick-text').textContent = spot.name;
+
+            // 0.5秒后显示店铺信息卡片，并恢复背景音乐音量
+            setTimeout(() => {
+                // 优化图片加载
+                loadImageWithPlaceholder(resultImg, spot.imageUrl, resultPhoto);
+                
+                resultName.textContent = spot.name;
+                resultAddress.textContent = spot.address;
+                const recHtml = spot.recommended.map(item => `<span>${item}</span>`).join(' ');
+                resultRec.innerHTML = recHtml;
+                resultSummary.textContent = spot.summary;
+                resultNav.href = spot.mapLink;
+
+                resultCard.style.display = 'block';
+                resetBtn.style.display = 'inline-block';
+
+                // 抽签结束，恢复背景音乐音量
+                bgMusic.volume = NORMAL_VOLUME;
+
+                // 动画结束后恢复按钮状态
+                setTimeout(() => {
+                    isDrawing = false;
+                    shakeBtn.disabled = false;
+                }, 200);
+            }, 500);
+
+        }, 1200);
+    });
+
+    // 重置逻辑
+    resetBtn.addEventListener('click', function() {
+        if (isDrawing) return;
+        // 隐藏结果和重置按钮
+        resultCard.style.display = 'none';
+        resetBtn.style.display = 'none';
+        // 重置所有签子状态
+        allSticks.forEach(stick => {
+            stick.classList.remove('popup');
+            stick.querySelector('.stick-text').textContent = '';
+            void stick.offsetHeight;
+        });
+        // 清空图片
+        resultImg.src = '';
+        resultImg.style.display = 'none';
+        // 启用摇签按钮
+        shakeBtn.disabled = false;
+        isDrawing = false;
+    });
+
+    // 移动端触摸支持
+    shakeBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        shakeBtn.click();
+    });
+    resetBtn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        resetBtn.click();
+    });
+
+    // 渲染30家店介绍卡片（无图片，无需懒加载）
+    const containerGrid = document.getElementById('shopListContainer');
+    function renderShopCards() {
+        let html = '';
+        breakfastSpots.forEach(shop => {
+            const fullStars = Math.floor(shop.rating);
+            const halfStar = shop.rating % 1 >= 0.5 ? '½' : '';
+            const stars = '★'.repeat(fullStars) + halfStar;
+            const recHtml = shop.recommended.map(item => `<span>${item}</span>`).join(' ');
+            html += `
+                <div class="shop-card">
+                    <h3>${shop.name}</h3>
+                    <div class="address">📍 ${shop.address}</div>
+                    <div class="rating">
+                        <span class="stars">${stars}</span>
+                        <span class="rating-score">${shop.rating.toFixed(1)}</span>
+                    </div>
+                    <div class="summary">${shop.summary}</div>
+                    <div class="recommend">👍 推荐：${recHtml}</div>
+                </div>
+            `;
+        });
+        containerGrid.innerHTML = html;
+    }
+    
+    // 页面加载完成后渲染店铺卡片
+    document.addEventListener('DOMContentLoaded', function() {
+        renderShopCards();
+    });
+})();
+</script>
+</body>
+</html>
